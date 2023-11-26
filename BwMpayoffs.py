@@ -207,7 +207,7 @@ def plot_mechanism(p1, p2, mechanism='a2', case = 'l2<h1', equations="No", mode=
         HMax = H0 + Delta/p1star
         Llabel = '$l_1$'
         Hlabel = '$h_1$'
-        title = f"Player 1 payoffs"
+        title = f"Feasible and IC payoffs of player 1"
     else:
         L0 = Ml2(p1)
         H0 = Mh2(p1)
@@ -215,7 +215,7 @@ def plot_mechanism(p1, p2, mechanism='a2', case = 'l2<h1', equations="No", mode=
         HMax = H0 + beta*(h2-l2)
         Llabel = '$l_2$'
         Hlabel = '$h_2$'
-        title = f"Player 2 payoffs"
+        title = f"Feasible and IC payoffs of player 2"
     plt.plot([L0, LMax], [H0, H0], color='black', linestyle='-')
     plt.plot([L0, L0], [H0, HMax], color='black', linestyle='-')
     plt.text(LMax, H0-gap, Llabel, horizontalalignment='center', verticalalignment='center')
