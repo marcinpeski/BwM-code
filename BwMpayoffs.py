@@ -1,6 +1,7 @@
 # To activate virtual environment, run .venv\Scripts\activate.ps1
-# After activating virtual environment, make sure that requiremnts are installed by running pip install -r requirements.txt
-# To test run it locally, run streamlit run graph_test.py
+# After activating virtual environment, make sure that requiremnts are installed by running: pip install -r requirements.txt
+# To test run it locally, run: streamlit run BwMpayoffs.py
+# To stop the local server, press Ctrl+C (in the terminal window)
 
 import streamlit as st
 st.set_page_config(layout="wide")
@@ -9,82 +10,9 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+import matplotlib.colors as mcolors
 
-l1 = 0
-h1 = 2
-l2 = 1
-h2 = 3
-
-beta = 0.5
-
-p2_star = (l2-l1)/(h2-l1)
-p2_star_star = (l2-l1)/(h2-l2)
-
-p1_star = {'l2<h1':{'a1':beta/(beta + (1-beta)*(h2-h1)/(h2-l1)), 'a2':beta/(beta + (1-beta)*(h2-h1)/(h2-l2))}, \
-        'l2>h1':{'a1':0, 'a2':1}}
-Delta = beta *(1-beta) *(h2-h1) *(h2-l2) /(h2-l1) /(h2-beta*l2-(1-beta)*h1)
-
-payoffs = {'l2<h1':{\
-                'a1':{'A':{'l1':r'$xM_{1}\left(l_{1}\right)$', \
-                        'h1':r'$xM_{1}\left(h_{1}\right)+\left(1-x\right)\left(1-p_{2}\right)\frac{h_{2}-h_{1}}{h_{2}-l_{2}}\left(l_{2}-l_{1}\right)$', \
-                        'l2':r'$\left(1-x\right)M_{2}\left(l_{2}\right)$', \
-                        'h2':r'$\left(1-x\right)M_{2}\left(h_{2}\right)$',}, \
-                    'B':{'l1':r'$xM_{1}\left(l_{1}\right)$', \
-                        'h1':r'$xM_{1}\left(h_{1}\right)+\left(1-x\right)p_{2}\left(h_{2}-h_{1}\right)$', \
-                        'l2':r'$\left(1-x\right)M_{2}\left(l_{2}\right)$', \
-                        'h2':r'$\left(1-x\right)M_{2}\left(h_{2}\right)-\left(1-x\right)p_{1}\left(h_{2}-h_{1}\right)+x\left(1-p_{1}\right)\left(h_{2}-l_{2}\right)$',}, \
-                    'C':{'l1':r'$x\left(\left(1-p_{2}\right)l_{2}+p_{2}h_{2}\right)$', \
-                        'h1':r'$xM_{1}\left(h_{1}\right)$', \
-                        'l2':r'$\left(1-x\right)M_{2}\left(l_{2}\right)$', \
-                        'h2':r'$\left(1-x\right)M_{2}\left(h_{2}\right)$'}},
-
-                'a2':{'A':{'l1':r'$xM_{1}\left(l_{1}\right)$', \
-                        'h1':r'$xM_{1}\left(h_{1}\right)$', \
-                        'l2':r'$\left(1-x\right)M_{2}\left(l_{2}\right)+\left(1-x\right)p_{1}\frac{h_{2}-h_{1}}{h_{2}-l_{1}}\left(l_{2}-l_{1}\right)$', \
-                        'h2':r'$\left(1-x\right)M_{2}\left(h_{2}\right)$'}, \
-                    'B':{'l1':r'$xM_{1}\left(l_{1}\right)$', \
-                        'h1':r'$xM_{1}\left(h_{1}\right)$', \
-                        'l2':r'$\left(1-x\right)M_{2}\left(l_{2}\right)$', \
-                        'h2':r'$\left(1-x\right)M_{2}\left(h_{2}\right)+x\left(1-p_{1}\right)\left(h_{2}-l_{2}\right)$'}, \
-                    'C':{'l1':r'$xM_{1}\left(l_{1}\right)+x\left(1-p_{1}\right)\left(l_{2}-l_{1}\right)$', \
-                        'h1':r'$xM_{1}\left(h_{1}\right)$', \
-                        'l2':r'$\left(1-x\right)M_{2}\left(l_{2}\right)+x\left(1-p_{1}\right)\left(l_{2}-l_{1}\right)$', \
-                        'h2':r'$\left(1-x\right)M_{2}\left(h_{2}\right)$'}}},
-
-           'l2>h1':{\
-                'a1':{'A':{'l1':r'', \
-                        'h1':r'', \
-                        'l2':r'', \
-                        'h2':r''}, \
-                    'B':{'l1':r'', \
-                        'h1':r'', \
-                        'l2':r'', \
-                        'h2':r''}, \
-                    'C':{'l1':r'', \
-                        'h1':r'', \
-                        'l2':r'', \
-                        'h2':r''},\
-                    'D':{'l1':r'', \
-                        'h1':r'', \
-                        'l2':r'', \
-                        'h2':r''}},
-
-                'a2':{'A':{'l1':r'', \
-                        'h1':r'', \
-                        'l2':r'', \
-                        'h2':r''}, \
-                    'B':{'l1':r'', \
-                        'h1':r'', \
-                        'l2':r'', \
-                        'h2':r''}, \
-                    'C':{'l1':r'', \
-                        'h1':r'', \
-                        'l2':r'', \
-                        'h2':r''},\
-                    'D':{'l1':r'', \
-                        'h1':r'', \
-                        'l2':r'', \
-                        'h2':r''}}}}
+from BwMpayoffsData import *
 
 def Ml1(p2):
     return beta*max(l2, (1-p2)*l1 + p2*h2)
@@ -98,7 +26,8 @@ def Ml2(p1):
 def Mh2(p1):
     return (1-beta)*h2
 
-def payoffs1(p1, p2, allocation, h_share):
+def payoffs1(p1, p2, allocation):
+    h_share = allocation['h_share']
     Welfare = (1-p1)*(1-p2)*(l2 + allocation['l1']['l2']*(l1-l2)) 
     Welfare += (1-p1)*p2*(h2 + allocation['l1']['h2']*(l1-h2)) 
     Welfare += p1*(1-p2)*(l2 + allocation['h1']['l2']*(h1-l2)) 
@@ -107,18 +36,16 @@ def payoffs1(p1, p2, allocation, h_share):
     L2 = Ml2(p1)
     H2 = max(Mh2(p1), L2 + ql2*(h2-l2))
     Welfare1 = Welfare - (1-p2)*L2 - p2*H2
-    if h_share == 0:
-        ql1 = (1-p2)*allocation['l1']['l2'] + p2*allocation['l1']['h2']
-        L1 = Welfare1 - p1*ql1*(h1-l1)
-        H1 = L1 + ql1*(h1-l1)
-    else: 
-        qh1 = (1-p2)*allocation['h1']['l2'] + p2*allocation['h1']['h2']
-        L1 = Welfare1 - p1 * qh1 * (h1-l1)
-        H1 = L1 + qh1*(h1-l1)
+    ql1 = (1-p2)*allocation['l1']['l2'] + p2*allocation['l1']['h2']
+    qh1 = (1-p2)*allocation['h1']['l2'] + p2*allocation['h1']['h2']
+    q1 = ((1-h_share)*ql1 + h_share*qh1)
+    L1 = Welfare1 - p1*q1*(h1-l1)
+    H1 = L1 + q1*(h1-l1)
         
-    return [L1, H1, L2, H2, Welfare]
+    return {'l1':L1, 'h1':H1, 'l2':L2, 'h2':H2, 'Welfare':Welfare}
 
-def payoffs2(p1, p2, allocation, h_share):
+def payoffs2(p1, p2, allocation):
+    h_share = allocation['h_share']
     Welfare = (1-p1)*(1-p2)*(l2 + allocation['l1']['l2']*(l1-l2)) 
     Welfare += (1-p1)*p2*(h2 + allocation['l1']['h2']*(l1-h2)) 
     Welfare += p1*(1-p2)*(l2 + allocation['h1']['l2']*(h1-l2)) 
@@ -130,14 +57,11 @@ def payoffs2(p1, p2, allocation, h_share):
     L1 = Ml1(p2)
     H1 = Mh1(p2)
     Welfare2 = Welfare - (1-p1)*L1 - p1*H1
-    if h_share == 0:
-        L2 = Welfare2 - p2 * ql2 * (h2-l2)
-        H2 = L2 + ql2 * (h2-l2)
-    else: 
-        L2 = Welfare2 - p2 * qh2 * (h2-l2)
-        H2 = L2 + qh2 * (h2-l2)
+    q2 = ((1-h_share)*ql2 + h_share*qh2)
+    L2 = Welfare2 - p2 * q2 * (h2-l2)
+    H2 = L2 + q2 * (h2-l2)
         
-    return [L2, H2, L1, H1, Welfare]
+    return {'l1':L1, 'h1':H1, 'l2':L2, 'h2':H2, 'Welfare':Welfare}
 
 def line_intersection(line1, line2):
     xdiff = np.array([line1[0][0] - line1[1][0], line2[0][0] - line2[1][0]])
@@ -155,214 +79,430 @@ def line_intersection(line1, line2):
     x1 = det(d, ydiff) / div
     return [x0, x1]
 
-def plot_mechanism(p1, p2, mechanism='a2', case = 'l2<h1', equations="No", mode='deployment'):
+class Allocation:
 
-    p1star = p1_star[case][mechanism]
-    p2star = p2_star
+    def __init__(self, p1, p2, allocation, mechanism='a2'):
 
-    if abs(p1-p1star)<0.05:
-        p1 = p1star
-    if abs(p2-p2star)<0.05:
-        p2 = p2star
-    
-    if equations == 'Yes':
-        n_plots = 3
-    else:
-        n_plots = 2
-    fig = plt.figure(figsize=(6*n_plots,5))
-
-    # Belief space
-    plt.subplot(1, n_plots, 1)  # 1 row, 2 columns, 1st subplot
-    ax = plt.gca()  # Get current axes
-    square = patches.Rectangle((0, 0), 1, 1, fill=False)
-    ax.add_patch(square)
-    if mechanism == 'a2':
-        plt.axvline(x=p1star, color='grey', linestyle='-')
-        plt.plot([0, p1star], [p2star, p2star], color='grey', linestyle='-')
-    else:
-        plt.plot([p1star, p1star], [1, p2star], color='grey', linestyle='-')
-        plt.plot([0, 1], [p2star, p2star], color='grey', linestyle='-')
-    plt.text(-0.05, p2star, '$p^{*}_2$', horizontalalignment='center', verticalalignment='center')
-    plt.axvline(x=p1, color='grey', linestyle='--')
-    plt.axhline(y=p2, color='grey', linestyle='--')
-    plt.plot(p1, p2, marker='o', color='red')
-    plt.title(f"Belief space")
-    plt.xlim(0, 1)  # Limit x-axis from 0 to 1
-    plt.ylim(0, 1)  # Limit y-axis from 0 to 1
-
-    # Payoff graph
-    big_gap = 0.01
-    gap = 0.01
-    plt.subplot(1, n_plots, 2)  # 1 row, 2 columns, 2nd subplot
-    plt.title(f"Payoffs in mechanism {mechanism}")
-    # Remove tick markks and axis
-    ax = plt.gca()  # Get current axes
-    ax.axis('off')
-    
-    #Draw axis lines
-    if mechanism == 'a2':
-        L0 = Ml1(p2)
-        H0 = Mh1(p2)
-        LMax = L0 + Delta/(1-p1star)
-        HMax = H0 + Delta/p1star
-        Llabel = '$l_1$'
-        Hlabel = '$h_1$'
-        title = f"Feasible and IC payoffs of player 1"
-    else:
-        L0 = Ml2(p1)
-        H0 = Mh2(p1)
-        LMax = L0 + Delta/(1-p2star)
-        HMax = H0 + beta*(h2-l2)
-        Llabel = '$l_2$'
-        Hlabel = '$h_2$'
-        title = f"Feasible and IC payoffs of player 2"
-    plt.plot([L0, LMax], [H0, H0], color='black', linestyle='-')
-    plt.plot([L0, L0], [H0, HMax], color='black', linestyle='-')
-    plt.text(LMax, H0-gap, Llabel, horizontalalignment='center', verticalalignment='center')
-    plt.text(L0-gap, HMax, Hlabel, horizontalalignment='center', verticalalignment='top')
-    plt.title(title)
-    
-    #Draw the Pareto frontier
-    if mechanism == 'a2':
-        if p2>p2star:
-            share = max(beta*(1-(1-p1star)/p1star*p1/(1-p1)), 0)
+        self.p1 = p1
+        self.p2 = p2
+        self.allocation = allocation
+        self.h_share = allocation['h_share']
+        self.mechanism = mechanism
+        if mechanism == 'a2':
+            self.player = 1
+            self.payoff_function = payoffs1
         else:
-            share = 0
-        x = payoffs1(p1, p2, {'l1':{'l2':share, 'h2':0}, 'h1':{'l2':1, 'h2':0}}, 0)
-        y = payoffs1(p1, p2, {'l1':{'l2':share, 'h2':0}, 'h1':{'l2':1, 'h2':0}}, 1)
-        plt.plot([x[0], y[0]], [x[1], y[1]], color='black', linestyle='--')
-        plt.plot(x[0], x[1], marker='o', color='grey')
-        plt.plot(y[0], y[1], marker='o', color='grey')
-        ax.fill([x[0], y[0], -1], [x[1], y[1], -1], facecolor='lightgrey')
-        line=[x, y]
-        lineL = [[L0,H0],[LMax,H0]]
-        lineH = [[L0,H0],[L0,HMax]]
-        iAB = line_intersection(line, lineH)
-        iC = line_intersection(line, lineL)
-        if p1<=p1star: #Zones A and B
-            plt.plot(iAB[0], iAB[1], marker='o', color='blue')
-            if p2>=p2star:
-                zone = 'A'
+            self.player = 2
+            self.payoff_function = payoffs2
+        self.payoffs = self.payoff_function(p1, p2, allocation)
+    
+    def l(self):
+        return self.payoffs['l1'] if self.player == 1 else self.payoffs['l2']
+    
+    def h(self):
+        return self.payoffs['h1'] if self.player == 1 else self.payoffs['h2']
+    
+    def draw(self, color = 'grey'):
+        plt.plot(self.l(), self.h(), marker='o', color=color)
+
+    def intersection(self, other, axis, value):
+        if axis == 'H':
+            alpha = (value - other.h())/(self.h() - other.h())
+        else:
+            alpha = (value - other.l())/(self.l() - other.l())
+        
+        new = Allocation(self.p1, self.p2, {'l1':{'l2':alpha*self.allocation['l1']['l2'] + (1-alpha)*other.allocation['l1']['l2'], \
+                                                    'h2':alpha*self.allocation['l1']['h2'] + (1-alpha)*other.allocation['l1']['h2']}, \
+                                                'h1':{'l2':alpha*self.allocation['h1']['l2'] + (1-alpha)*other.allocation['h1']['l2'], \
+                                                    'h2':alpha*self.allocation['h1']['h2'] + (1-alpha)*other.allocation['h1']['h2']}, \
+                                                'h_share':alpha*self.allocation['h_share'] + (1-alpha)*other.allocation['h_share']}, self.mechanism)
+        return new
+    
+    def __repr__(self):
+        return f"Alloc.({self.l()}, {self.h()})"
+
+class Plot:
+
+    def __init__(self, p1, p2, mechanism='a2', case = 'l2<h1', mode='deployment', sticky = True, mechanism_payoff = 'u(l)'):
+
+        self.big_gap = 0.01
+        self.gap = 0.01
+        self.mechanism = mechanism
+        self.case = case
+        self.mode = mode
+        self.p1star = p1_star[case][mechanism]
+        self.p2star = p2_star
+        if case == 'l2<h1':
+            self.p2starstar = 0
+        else:
+            self.p2starstar = 0
+        self.mechanism_payoff = mechanism_payoff
+        
+        self.p1 = p1
+        if sticky and abs(p1-self.p1star)<0.05:
+            self.p1 = self.p1star
+        self.p2 = p2
+        if sticky and abs(p2-self.p2star)<0.05:
+            self.p2 = self.p2star
+
+        self.n_plots = 2
+        self.find_zones()
+
+    def payoffs(self, l, h):
+        if self.mechanism == 'a1':
+            p = self.p2
+        if self.mechanism == 'a2':
+            p = self.p1
+        if self.mechanism_payoff == 'expected':
+            return (1-p)*l + p*h
+        if self.mechanism_payoff == 'u(l)': 
+            return l
+        if self.mechanism_payoff == 'u(h)': 
+            return h        
+
+
+    def find_zones(self):
+        self.zones = []
+        if self.mechanism == 'a1' and self.case == 'l2<h1':
+            if self.p2>=self.p2star and self.p1<=self.p1star:
+                self.zones.append('A')
+            if self.p2>=self.p2star and self.p1>=self.p1star: 
+                self.zones.append('C')
+            if self.p2<=self.p2star: 
+                self.zones.append('B')
+
+        if self.mechanism == 'a2' and self.case == 'l2<h1':
+            if self.p1<=self.p1star: #Zones A and B
+                if self.p2>=self.p2star:
+                    self.zones.append('A')
+                else:
+                    self.zones.append('B')
+            if self.p1>=self.p1star: #Zone C
+                self.zones.append('C')
+
+    def set_plot_boundaries(self):
+        if self.mechanism == 'a2':
+            self.L0 = Ml1(self.p2)
+            self.H0 = Mh1(self.p2)
+            self.LMax = self.L0 + Delta/(1-self.p1star)
+            self.HMax = self.H0 + Delta/self.p1star
+        else:
+            self.L0 = Ml2(self.p1)
+            self.H0 = Mh2(self.p1)
+            self.LMax = self.L0 + Delta/(1-self.p2star)
+            self.HMax = self.H0 + beta*(h2-l2)
+        
+    
+    def find_feasible(self):
+        if self.mechanism == 'a2' and self.case == 'l2<h1':
+            if self.p2>self.p2star:
+                share = max(beta*(1-(1-self.p1star)/self.p1star*self.p1/(1-self.p1)), 0)
             else:
-                zone = 'B'
-        if p1>=p1star: #Zone C
-            plt.plot(iC[0], iC[1], marker='o', color='blue')
-            zone = 'A'
-
-        #frontier
-        xstar = payoffs1(p1star, p2, {'l1':{'l2':share, 'h2':0}, 'h1':{'l2':1, 'h2':0}}, 0)
-        ystar = payoffs1(p1star, p2, {'l1':{'l2':share, 'h2':0}, 'h1':{'l2':1, 'h2':0}}, 1)
-        line=[xstar, ystar]
-        iAB = line_intersection(line, lineH)
-        iC = line_intersection(line, lineL)
-        frontier = [[iAB[0], iC[0]], [iAB[1], iC[1]]]
-        if p1==p1star:
-            plt.plot(frontier[0], frontier[1], color='blue', linestyle='-')
-        else:
-            plt.plot(frontier[0], frontier[1], color='grey', linestyle=':')
-    else:
-        x = payoffs2(p1, p2, {'l1':{'l2':1, 'h2':0}, 'h1':{'l2':1, 'h2':0}}, 0)
-        y = payoffs2(p1, p2, {'l1':{'l2':0, 'h2':0}, 'h1':{'l2':1, 'h2':0}}, 0)
-        z = payoffs2(p1, p2, {'l1':{'l2':0, 'h2':0}, 'h1':{'l2':1, 'h2':0}}, 1)
-        ax.fill([x[0], y[0], z[0], -1], [x[1], y[1], z[1], -1], facecolor='lightgrey')
-        plt.plot([x[0], y[0], z[0]], [x[1], y[1], z[1]], color='black', linestyle='--')
-        plt.plot(x[0], x[1], marker='o', color='grey')
-        plt.plot(y[0], y[1], marker='o', color='grey')
-        plt.plot(z[0], z[1], marker='o', color='grey')
+                share = 0
+            x = Allocation(self.p1, self.p2, {'l1':{'l2':share, 'h2':0}, 'h1':{'l2':1, 'h2':0}, 'h_share':0}, self.mechanism)
+            y = Allocation(self.p1, self.p2, {'l1':{'l2':share, 'h2':0}, 'h1':{'l2':1, 'h2':0}, 'h_share':1}, self.mechanism)
+            feasible = [x, y]
+        if self.mechanism == 'a1' and self.case == 'l2<h1':
+            x = Allocation(self.p1, self.p2, {'l1':{'l2':1, 'h2':0}, 'h1':{'l2': 1, 'h2':0}, 'h_share':0}, self.mechanism)
+            y = Allocation(self.p1, self.p2, {'l1':{'l2':0, 'h2':0}, 'h1':{'l2':1, 'h2':0}, 'h_share':0}, self.mechanism)
+            z = Allocation(self.p1, self.p2, {'l1':{'l2':0, 'h2':0}, 'h1':{'l2':1, 'h2':0}, 'h_share':1}, self.mechanism)
+            feasible = [x, y, z]
+        return feasible
+            
+    def draw_boundary(self, boundary, color = 'grey', fillcolor = None, linestyle = '-'):  
+        for x in boundary:    
+            x.draw(color)
+        ls = [x.l() for x in boundary]
+        hs = [x.h() for x in boundary]
+        plt.plot(ls, hs, color=color, linestyle=linestyle)
+        if fillcolor is not None:
+            plt.fill(ls+[-1], hs+[-1], facecolor=fillcolor)
         
 
-        lineXY=[x, y]
-        lineYZ=[y, z]
-        lineL = [[L0,H0],[LMax,H0]]
-        lineH = [[L0,H0],[L0,HMax]]
-        iA = line_intersection(lineL, lineXY)
-        iB = line_intersection(lineH, lineYZ)
-        iC = line_intersection(lineL, lineYZ)
-        if p2>=p2star and p1<=p1star: #Zone A
-            plt.plot(iA[0], iA[1], marker='o', color='blue')
-            zone = 'A'
-        if p2>=p2star and p1>=p1star: #Zone C
-            plt.plot(iC[0], iC[1], marker='o', color='blue')
-            zone = 'C'
-        if p2<=p2star: #Zone B
-            plt.plot(iB[0], iB[1], marker='o', color='blue')
-            zone = 'B'
-        
-        #frontier
-        xstar = payoffs2(p1, p2star, {'l1':{'l2':1, 'h2':0}, 'h1':{'l2':1, 'h2':0}}, 0)
-        ystar = payoffs2(p1, p2star, {'l1':{'l2':0, 'h2':0}, 'h1':{'l2':1, 'h2':0}}, 0)
-        zstar = payoffs2(p1, p2star, {'l1':{'l2':0, 'h2':0}, 'h1':{'l2':1, 'h2':0}}, 1)
-        lineXY=[xstar, ystar]
-        lineYZ=[ystar, zstar]
-        iA = line_intersection(lineL, lineXY)
-        iB = line_intersection(lineH, lineYZ)
-        iC = line_intersection(lineL, lineYZ)
-        if p1<=p1star: #Zone A adn B:
-            frontier = [iA[0], ystar[0], iB[0]], [iA[1], ystar[1], iB[1]]
-        if p1>=p1star: #Zone C and B:
-            frontier = [iC[0], iB[0]], [iC[1], iB[1]]
-        if p2==p2star:
-            plt.plot(frontier[0], frontier[1], color='blue', linestyle='-')
-        else:
-            plt.plot(frontier[0], frontier[1], color='grey', linestyle=':')
+    def find_frontier(self):
+        self.set_plot_boundaries
+        if self.mechanism == 'a2' and self.case == 'l2<h1':
+            if self.p2>self.p2star:
+                share = max(beta*(1-(1-self.p1star)/self.p1star*self.p1/(1-self.p1)), 0)
+            else:
+                share = 0
+            xstar = Allocation(self.p1star, self.p2, {'l1':{'l2':share, 'h2':0}, 'h1':{'l2':1, 'h2':0}, 'h_share':0}, self.mechanism)
+            ystar = Allocation(self.p1star, self.p2, {'l1':{'l2':share, 'h2':0}, 'h1':{'l2':1, 'h2':0}, 'h_share':1}, self.mechanism)
+            iAB = xstar.intersection(ystar, 'L', self.L0)
+            iC = xstar.intersection(ystar, 'H', self.H0)
+            frontier = [iAB, iC]
+        if self.mechanism == 'a1' and self.case == 'l2<h1':
+            xstar = Allocation(self.p1, self.p2star, {'l1':{'l2':1, 'h2':0}, 'h1':{'l2':1, 'h2':0}, 'h_share':0}, self.mechanism)
+            ystar = Allocation(self.p1, self.p2star, {'l1':{'l2':0, 'h2':0}, 'h1':{'l2':1, 'h2':0}, 'h_share':0}, self.mechanism)
+            zstar = Allocation(self.p1, self.p2star, {'l1':{'l2':0, 'h2':0}, 'h1':{'l2':1, 'h2':0}, 'h_share':1}, self.mechanism)
+            iA = xstar.intersection(ystar, 'H', self.H0)
+            iB = ystar.intersection(zstar, 'L', self.L0)
+            iC = ystar.intersection(zstar, 'H', self.H0)
+            if self.p1<=self.p1star: #Zone A adn B:
+                frontier = [iA, ystar, iB]
+            if self.p1>=self.p1star: #Zone C and B:
+                frontier = [iC, iB]
+        return frontier
 
-    #Limit the plot
-    plt.xlim(L0-big_gap, LMax+big_gap)  # Limit x-axis
-    plt.ylim(H0-big_gap, HMax+big_gap)  # Limit y-axis
+    def find_allocation(self):
+        self.set_plot_boundaries()
+        feasible = self.find_feasible()
+        frontier = self.find_frontier()
+        if self.mechanism == 'a2' and self.case == 'l2<h1':
+            if self.p1 == self.p1star:
+                allocation = frontier
+            else: 
+                x = feasible[0]
+                y = feasible[1]
+                iAB = x.intersection(y, 'L', self.L0)
+                iC = x.intersection(y, 'H', self.H0)
+                allocation = []
+                if ('A' in self.zones or 'B' in self.zones): 
+                    allocation.append(iAB)
+                if 'C' in self.zones: #Zone C
+                    allocation.append(iC)
+        if self.mechanism == 'a1' and self.case == 'l2<h1':
+            if self.p2 == self.p2star:
+                allocation = frontier
+            else:
+                x = feasible[0]
+                y = feasible[1]
+                z = feasible[2]
+                iA = x.intersection(y, 'H', self.H0)
+                iB = y.intersection(z, 'L', self.L0)
+                iC = y.intersection(z, 'H', self.H0)
+                if 'A' in self.zones:
+                    allocation = [iA]
+                if 'B' in self.zones:
+                    allocation = [iB]
+                if 'C' in self.zones:
+                    allocation = [iC]
+        return allocation
+            
+    def shade(self, x, y):
+        # Example function, replace with your actual function
+        if self.mechanism == 'a2' and self.case == 'l2<h1':
+            shade1 = np.minimum((1-x)/(1-self.p1star), x/self.p1star) 
+            shade2=  np.minimum((1-y)/(1-self.p2star), (y-self.p2starstar)/(self.p2star - self.p2starstar))
+            return  shade1 * shade2
+        if self.mechanism == 'a2' and self.case == 'l2<h1':
+            shade1 = np.minimum((1-x)/(1-self.p1star), x/self.p1star) 
+            shade2=  np.minimum((1-y)/(1-self.p2star), (y-self.p2starstar)/(self.p2star - self.p2starstar))
+            return  shade1 * shade2
+
     
-    # Equations
-    if equations == "Yes":
-        plt.subplot(1, 3, 3)  # 1 row, 2 columns, 2nd subplot
-        plt.title(f"Payoff equations in mechanism {mechanism}, zone {zone}")
+    def plot_belief_space(self, extras = []):
+        ax = plt.gca()  # Get current axes
+        square = patches.Rectangle((0, 0), 1, 1, fill=False)
+        ax.add_patch(square)
+        if self.mechanism == 'a2' and self.case == 'l2<h1':
+            plt.axvline(x=self.p1star, color='grey', linestyle='-')
+            plt.plot([0, self.p1star], [self.p2star, self.p2star], color='grey', linestyle='-')
+        if self.mechanism == 'a1' and self.case == 'l2<h1':
+            plt.plot([self.p1star, self.p1star], [1, self.p2star], color='grey', linestyle='-')
+            plt.plot([0, 1], [self.p2star, self.p2star], color='grey', linestyle='-')
+        plt.text(-0.05, self.p2star, '$p^{*}_2$', horizontalalignment='center', verticalalignment='center')
+        plt.axvline(x=self.p1, color='grey', linestyle='--')
+        plt.axhline(y=self.p2, color='grey', linestyle='--')
+        if 'The Gap' in extras:
+            if self.mechanism == 'a2':
+                plt.axvline(x=self.p1, color='pink', linestyle='--')
+            if self.mechanism == 'a1':
+                plt.axhline(y=self.p2, color='pink', linestyle='--')
+        plt.plot(self.p1, self.p2, marker='o', color='red')
+
+        if 'The Gap' in extras and self.mechanism == 'a2' and self.case == 'l2<h1':
+            #Draw the gap
+            # Create a meshgrid
+            x = np.linspace(0, 1, 100)
+            y = np.linspace(0, 1, 100)
+            X, Y = np.meshgrid(x, y)
+            # Evaluate the function
+            Z = self.shade(X, Y)
+            # Create a custom color map from white to light green
+            colors = [(1, 1, 1), (0.564, 0.933, 0.564)]  # White to light green
+            n_bins = 100  # Increase this for smoother color transitions
+            cmap = mcolors.LinearSegmentedColormap.from_list("mycmap", colors, N=n_bins)
+            # Plot the results
+            plt.pcolormesh(X, Y, Z, cmap=cmap, shading='auto')
+
+        if 'Equations' in extras:
+            #Draw the linearly transferable zones
+            pass
+        
+        plt.title(f"Belief space")
+        plt.xlim(0, 1)  # Limit x-axis from 0 to 1
+        plt.ylim(0, 1)  # Limit y-axis from 0 to 1
+
+    def plot_feasible(self):
+        plt.title(f"Payoffs in mechanism {self.mechanism}")
         # Remove tick markks and axis
         ax = plt.gca()  # Get current axes
         ax.axis('off')
-        payoffs_local=payoffs[case][mechanism][zone]
+        #Draw axis lines
+        self.set_plot_boundaries()
+        if self.mechanism == 'a2':
+            Llabel = '$l_1$'
+            Hlabel = '$h_1$'
+            title = f"Feasible and IC payoffs of player 1"
+        else:
+            Llabel = '$l_2$'
+            Hlabel = '$h_2$'
+            title = f"Feasible and IC payoffs of player 2"
+        plt.plot([self.L0, self.LMax], [self.H0, self.H0], color='black', linestyle='-')
+        plt.plot([self.L0, self.L0], [self.H0, self.HMax], color='black', linestyle='-')
+        plt.text(self.LMax, self.H0-self.gap, Llabel, horizontalalignment='center', verticalalignment='center')
+        plt.text(self.L0-self.gap, self.HMax, Hlabel, horizontalalignment='center', verticalalignment='top')
+        plt.title(title)
+        #Draw feasible set, the allocation, and strong Pareto frontier.
+        self.draw_boundary(self.find_frontier(), color = 'lightgrey', linestyle=':')
+        self.draw_boundary(self.find_feasible(), color = 'black', fillcolor = 'lightgrey', linestyle='--')
+        self.draw_boundary(self.find_allocation(), color = 'blue')
+        #Limit the plot
+        plt.xlim(self.L0 - self.big_gap, self.LMax + self.big_gap)  # Limit x-axis
+        plt.ylim(self.H0 - self.big_gap, self.HMax + self.big_gap)  # Limit y-axis
+
+    def plot_mechanism_payoffs(self):
+        plt.title(f"Payoffs in mechanism {self.mechanism}, zone {self.zones[0]}")
+        ax = plt.gca()  # Get current axes
+        ax.axis('off')
+        x0 = 0
+        y0 = 0
+        xMax = 1
+        yMax = max(h2, h1)
+        ylabel = 'payoffs'
+        if self.mechanism == 'a2':
+            xlabel = '$p_2$'
+        else:
+            xlabel = '$p_1$'
+        plt.plot([x0, xMax], [y0, y0], color='pink', linestyle='-')
+        plt.plot([x0, x0], [y0, yMax], color='black', linestyle='-')
+        plt.text(xMax, y0 - self.gap, xlabel, horizontalalignment='center', verticalalignment='center')
+        plt.text(x0 - self.gap, yMax, ylabel, horizontalalignment='center', verticalalignment='top')
+        
+        epsilon = 0.01
+        allocation_payoffs = []
+        monopoly_payoffs = []
+        allocation_current = self.find_allocation()[0]
+        allocation_current_payoffs = []
+        if self.mechanism == 'a2':
+            ps = [0.01, self.p2star-epsilon, self.p2star+epsilon, 0.99]
+            for p2 in ps:
+                p = Plot(self.p1, p2, mechanism=self.mechanism, case = self.case, sticky = False, mechanism_payoff = self.mechanism_payoff)
+                allocation = p.find_allocation()[0]
+                allocation_payoffs.append(p.payoffs(allocation.l(), allocation.h()))
+                monopoly_payoffs.append(p.payoffs(Ml1(p2), Mh1(p2)))
+            allocation_current_payoffs += [self.p2, self.payoffs(allocation_current.l(), allocation_current.h())]
+        if self.mechanism == 'a1':
+            ps = [0.01, self.p1star-epsilon, self.p1star+epsilon, 0.99]
+            for p1 in ps:
+                p = Plot(p1, self.p2, mechanism=self.mechanism, case = self.case, sticky = False, mechanism_payoff = self.mechanism_payoff)
+                allocation = p.find_allocation()[0]
+                allocation_payoffs.append(p.payoffs(allocation.l(), allocation.h()))
+                monopoly_payoffs.append(p.payoffs(Ml2(p1), Mh2(p1)))
+            allocation_current_payoffs += [self.p1, self.payoffs(allocation_current.l(), allocation_current.h())]
+        
+        plt.fill(ps+ps[::-1], allocation_payoffs+monopoly_payoffs[::-1], facecolor='lightgreen')
+        plt.plot(ps, monopoly_payoffs, color='lightgreen', linestyle='--')
+        plt.plot(ps, allocation_payoffs, color='green', linestyle='-')
+
+        plt.plot(allocation_current_payoffs[0], allocation_current_payoffs[1], marker='o', color='blue')
+        
+        plt.plot([0.6, 0.75], [yMax-0.2, yMax-0.2], color='lightgreen', linestyle='--')
+        plt.text(0.8, yMax-0.3, 'monopoly payoffs')
+        plt.plot([0.6, 0.75], [yMax-0.5, yMax-0.5], color='green', linestyle='-')
+        plt.text(0.8, yMax-0.6, 'allocation payoffs')
+
+    def plot_allocations(self):
+        plt.title(f"Allocations in mechanism {self.mechanism}, zone {self.zones[0]}")
+        ax = plt.gca()  # Get current axes
+        ax.axis('off')
+        payoffs_local=payoff_equations[self.case][self.mechanism][self.zones[0]]
+    
+
+    def plot_equations(self):
+        plt.title(f"Payoff equations in mechanism {self.mechanism}, zone {self.zones[0]}")
+        # Remove tick markks and axis
+        ax = plt.gca()  # Get current axes
+        ax.axis('off')
+        payoffs_local=payoff_equations[self.case][self.mechanism][self.zones[0]]
         r = 1
         for player_type in payoffs_local:
             r -= 0.1
             payoff = payoffs_local[player_type].replace("x", r"\beta ")
-            if ('1' in player_type and '2' in mechanism) or ('2' in player_type and '1' in mechanism):
+            if ('1' in player_type and '2' in self.mechanism) or ('2' in player_type and '1' in self.mechanism):
                 color = 'blue'
             else:
                 color = 'black' 
             plt.text(0, r, f'{player_type}: '+payoff, horizontalalignment='left', verticalalignment='center', color = color)
 
-    #Final
-    if mode == 'development':
-        plt.show()
-    else:
-        return fig
+
+    def draw(self, plots):
+
+        self.n_plots = len(plots)
+        fig = plt.figure(figsize=(6*self.n_plots,3.5))
+
+        for k in range(self.n_plots):
+            plt.subplot(1, self.n_plots, k+1)  # 1 row, 2 columns, 2nd subplot
+            if plots[k] == 'Belief space':
+                extras = []
+                if 'The Gap' in plots: extras.append('The Gap')
+                if 'Equations' in plots: extras.append('Equations')
+                self.plot_belief_space(extras)
+            if plots[k] == 'Feasible payoffs':
+                self.plot_feasible()
+            if plots[k] == 'The Gap':
+                self.plot_mechanism_payoffs()
+            if plots[k] == 'Allocations':
+                self.plot_allocations()
+            if plots[k] == 'Equations':
+                self.plot_equations()
+                
+        #Final
+        if self.mode == 'development':
+            plt.show()
+        else:
+            return fig
+    
 
 mode = 'deployment' 
 #mode = 'development'
 
 if mode == 'deployment':
-    # Title
-    st.title('Payoffs in robust mechanisms ')
     # Create columns
-    col1, col2, col3, col4 = st.columns([5,5, 1, 1])
+    col0, col1, col2, col3, col4 = st.columns([2, 5,5, 1, 1])
+    with col0:
+        page = st.radio("Page", ["Feasible payoffs", "The Gap", "Equations", "Allocations"])
     # Create slider widgets in columns
     with col1:
         p1_value = st.slider('p1:', min_value=0.001, max_value=0.999, value=0.3, step=0.01, format='%.3f')
     with col2:
-        p2_value = st.slider('p2:', min_value=0.0, max_value=1.0, value=0.2, step=0.01, format='%.3f')
+        p2_value = st.slider('p2:', min_value=0.001, max_value=0.999, value=0.2, step=0.01, format='%.3f')
     # Create a radio button selector in a column
     # Mechanism selection using buttons for a horizontal layout
-
     with col3:
         mechanism = st.radio("Mechanism", ['a1', 'a2'])
 
-    with col4:
-        equations = st.radio("Equations", ['Yes', 'No'])
-    
-    # Display the plot
-    fig = plot_mechanism(p1_value, p2_value, mechanism = mechanism, equations=equations)
+    plot = Plot(p1_value, p2_value, mechanism = mechanism, mode=mode)
+    # Display the selected page
+    if page == "Feasible payoffs":
+        fig = plot.draw(['Belief space', 'Feasible payoffs'])
+    if page == "The Gap":
+        with col4:
+            payoffs = st.radio("Payoffs", ['expected', 'u(l)', 'u(h)'] )
+        plot = Plot(p1_value, p2_value, mechanism = mechanism, mode=mode, mechanism_payoff = payoffs)
+        fig = plot.draw(['Belief space', 'The Gap'])
+    if page == "Equations":
+        fig = plot.draw(['Belief space', 'Equations'])
+    if page == "Allocations":
+        fig = plot.draw(['Belief space', 'Allocations'])
     st.pyplot(fig)
-
+    
 else:
-    plot_mechanism(0.3, 0.2, mechanism='a1', equations = 'Yes', mode='development')
-    plot_mechanism(0.3, p2_star, mechanism='a1', mode='development')
-    plot_mechanism(0.3, 0.5, mechanism='a1', mode='development')
-    plot_mechanism(0.3, 0.2, mechanism='a2', case = 'l2<h1', mode='development')
-    plot_mechanism(0.3, 0.2, mechanism='a2', case = 'l2<h1', mode='development')
+    feature = 'The Gap'
+    #feature = 'Feasible payoffs'
+    plot=Plot(0.2, 0.3, mechanism='a1', mode=mode).draw(['Belief space', feature])
+    plot = Plot(0.3, p2_star, mechanism='a1', mode='development').draw(['Belief space', feature])
+    plot=Plot(0.3, 0.5, mechanism='a1', mode='development').draw(['Belief space', 'Feasible payoffs'])
+    plot=Plot(0.3, 0.2, mechanism='a2', case = 'l2<h1', mode='development').draw(['Belief space', 'Feasible payoffs'])
+    plot = Plot(0.3, 0.2, mechanism='a2', case = 'l2<h1', mode='development').draw(['Belief space', 'Feasible payoffs'])
