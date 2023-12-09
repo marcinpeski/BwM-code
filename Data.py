@@ -34,7 +34,7 @@ payoff_equations = {'l2<h1':{\
                         'h1':r'$xM_{1}\left(h_{1}\right)+\left(1-x\right)p_{2}\left(h_{2}-h_{1}\right)$', \
                         'l2':r'$\left(1-x\right)M_{2}\left(l_{2}\right)$', \
                         'h2':r'$\left(1-x\right)M_{2}\left(h_{2}\right) - \left(1-x\right)p_{1}\left(h_{2}-h_{1}\right) + x\left(1-p_{1}\right)\left(h_{2}-l_{2}\right)$'}, \
-                    'C':{'l1':r'$xM_{1}\left(l_{1}\right)$', \
+                    'C':{'l1':r'$x\left(\left(1-p_{2}\right) l_{2}+ p_{2}h_{2} \right)$', \
                         'h1':r'$xM_{1}\left(h_{1}\right)$', \
                         'l2':r'$\left(1-x\right)M_{2}\left(l_{2}\right)$', \
                         'h2':r'$\left(1-x\right)M_{2}\left(h_{2}\right)$'}}},
