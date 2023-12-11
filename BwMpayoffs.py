@@ -308,40 +308,42 @@ if mode == 'deployment':
     col0, col1, col2, col3, col4 = st.columns([2, 5,5, 2, 2])
     with col0:
         page = st.radio("Page", ["Feasible payoffs", "The Gap", "Equations", "Allocations", "Mixing and matching"])
+    p1_value = 0.3
+    p2_value = 0.2
     # Create slider widgets in columns
     with col1:
-        p1_value = st.slider('p1:', min_value=0.001, max_value=0.999, value=0.3, step=0.01, format='%.3f')
+        p1_value = st.slider('p1:', min_value=0.001, max_value=0.999, value=p1_value, step=0.01, format='%.3f')
     with col2:
-        p2_value = st.slider('p2:', min_value=0.001, max_value=0.999, value=0.2, step=0.01, format='%.3f')
+        p2_value = st.slider('p2:', min_value=0.001, max_value=0.999, value=p2_value, step=0.01, format='%.3f')
     # Create a radio button selector in a column
     # Mechanism selection using buttons for a horizontal layout
     # Display the selected page
     if page == "Feasible payoffs":
         with col3:
-            mechanism = st.radio("Mechanism", ['a1', 'a2'])
+            mechanism = st.radio("Mechanism", ['a1', 'a2'], index = 1)
         plot = Plot(p1_value, p2_value, mechanism = mechanism, mode=mode)
         fig = plot.draw(['Belief space', 'Feasible payoffs'])
     if page == "The Gap":
         with col3:
-            mechanism = st.radio("Mechanism", ['a1', 'a2'])
+            mechanism = st.radio("Mechanism", ['a1', 'a2'], index = 1)
         with col4:
             payoffs = st.radio("Payoffs", ['expected', 'u(l)', 'u(h)'] )
         plot = Plot(p1_value, p2_value, mechanism = mechanism, mode=mode, mechanism_payoff = payoffs)
         fig = plot.draw(['Belief space', 'The Gap'])
     if page == "Equations":
         with col3:
-            mechanism = st.radio("Mechanism", ['a1', 'a2'])
+            mechanism = st.radio("Mechanism", ['a1', 'a2'], index = 1)
         plot = Plot(p1_value, p2_value, mechanism = mechanism, mode=mode)
         fig = plot.draw(['Belief space', 'Equations'])
     if page == "Allocations":
         with col3:
-            mechanism = st.radio("Mechanism", ['a1', 'a2'])
+            mechanism = st.radio("Mechanism", ['a1', 'a2'], index = 1)
         plot = Plot(p1_value, p2_value, mechanism = mechanism, mode=mode)
         fig = plot.draw(['Belief space', 'Allocations'])
     if page == "Mixing and matching":
         mechanisms = {}
         with col3:
-            checkbox_status = {'a1':True, 'a2':False, 'a2-gap':True, 'max(a1, a2-gap)':False}
+            checkbox_status = {'a1':False, 'a2':False, 'a2-gap':False, 'max(a1, a2-gap)':False}
             for m in checkbox_status:
                 mechanisms[m] = st.checkbox(m, checkbox_status[m])
         with col4:
