@@ -1,6 +1,6 @@
 # To activate virtual environment, run .venv\Scripts\activate.ps1
 # After activating virtual environment, make sure that requiremnts are installed by running: pip install -r requirements.txt
-# To test run it locally, run: streamlit run BwMpayoffs.py
+# To test run it locally, run: python -m streamlit run BwMpayoffs.py
 # To stop the local server, press Ctrl+C (in the terminal window)
 
 import streamlit as st
