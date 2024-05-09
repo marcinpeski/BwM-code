@@ -203,6 +203,13 @@ class Plot:
             plt.text(0, r, f'{player_type}: '+payoff, horizontalalignment='left', verticalalignment='center', color = color)
 
     def plot_mixing(self):
+
+        def draw_area(l,h, color):
+            x = [l, ax.get_xlim()[1]]
+            y1 = [h, h]
+            y2 = [ax.get_ylim()[1], ax.get_ylim()[1]]
+            ax.fill_between(x, y1, y2, color=color, alpha = 0.3)
+
         plt.title(f"Payoffs in mechanism $"+self.mechanism.name()+f"$")
         # Remove tick markks and axis
         ax = plt.gca()  # Get current axes
@@ -213,6 +220,8 @@ class Plot:
         pa2 = Mechanism(mechanism = 'a2', case = self.mechanism.case, player='1') 
         pa2_allocations = pa2.find_allocation(self.p)
         pa1_allocations = pa1.find_allocation(self.p)
+        gap = pa2_allocations[0].l() *(1-self.p1) + pa2_allocations[0].h() *self.p1  \
+                - pa1_allocations[0].l() *(1-self.p1) - pa1_allocations[0].h() *self.p1
 
         L0, H0, LMax, HMax = self.L0, self.H0, self.LMax, self.HMax
         Llabel = '$l_1$'
@@ -223,17 +232,23 @@ class Plot:
         plt.text(LMax, H0-self.gap, Llabel, horizontalalignment='center', verticalalignment='center')
         plt.text(L0-self.gap, HMax, Hlabel, horizontalalignment='center', verticalalignment='top')
         plt.title(title)
+
+        #Limit the plot
+        plt.xlim(L0 - self.big_gap - self.mixing['transfer'] * Delta, LMax + self.big_gap)  # Limit x-axis
+        plt.ylim(H0 - self.big_gap - self.mixing['transfer'] * Delta, HMax + self.big_gap)  # Limit y-axis
     
         #Draw allocations 
         mechanisms = self.mixing['mechanisms']
-        transfer = self.mixing['transfer'] * Delta * self.mechanism.shade1(self.p1)
+        #transfer = self.mixing['transfer'] * Delta * self.mechanism.shade1(self.p1)
+        transfer = self.mixing['transfer'] * gap
         if mechanisms['a1']:
             color = 'lightblue'
             allocations = pa1_allocations
+            draw_area(allocations[0].l(), allocations[0].h(), color)
             self.draw_boundary(allocations, label = '$a_1$', color = color)
             line = [[allocations[0].l()-20, allocations[0].l()+20], [allocations[0].h()+20*(1-self.p1)/self.p1, allocations[0].h()-20*(1-self.p1)/self.p1]]
             plt.plot(line[0], line[1], color = color, linestyle = '--')
-        if mechanisms['a2'] and mechanisms['a2-gap']:    
+        if mechanisms['a2'] and mechanisms['a2-gap']:  
             for a in pa2_allocations:
                 plt.arrow(a.l()-0.2*transfer, a.h()-0.2*transfer, -0.6*transfer, -0.6*transfer, color = 'lightgrey')
         if mechanisms['a2']:
@@ -243,8 +258,12 @@ class Plot:
             line = [[allocations[0].l()-20, allocations[0].l()+20], [allocations[0].h()+20*(1-self.p1)/self.p1, allocations[0].h()-20*(1-self.p1)/self.p1]]
             plt.plot(line[0], line[1], color = color, linestyle = '--')
         if mechanisms['a2-gap']:
-            color = 'brown'
+            color = 'red'
             allocations = pa2_allocations
+            if self.p1 != self.mechanism.p1star:
+                draw_area(allocations[0].l()-transfer, allocations[0].h()-transfer, color)
+            else:
+                draw_area(pa1_allocations[0].l(), pa1_allocations[0].h(), color)
             self.draw_boundary(pa2_allocations, label = '$a_2$-Gap', color = color, transfer = transfer)
             line = [[allocations[0].l()-transfer-20, allocations[0].l()-transfer+20], [allocations[0].h()-transfer+20*(1-self.p1)/self.p1, allocations[0].h()-transfer-20*(1-self.p1)/self.p1]]
             plt.plot(line[0], line[1], color = color, linestyle = '--')
@@ -255,20 +274,19 @@ class Plot:
             allocations = pa1_allocations
             a1 = [allocations[0].l(), allocations[0].h()]
             a = [max(a1[0], a2_g[0]), max(a1[1], a2_g[1])]
+            draw_area(a[0], a[1], color)
             plt.plot(a[0], a[1], marker='o', color=color)
             plt.plot([a[0], a1[0]], [a[1], a1[1]], color = color, linestyle = ':')
             plt.plot([a[0], a2_g[0]], [a[1], a2_g[1]], color = color, linestyle = ':')
             line = [[a[0]-20, a[0]+20], [a[1]+20*(1-self.p1)/self.p1, a[1]-20*(1-self.p1)/self.p1]]
-            plt.plot(line[0], line[1], color = color, linestyle = '--')
+            #plt.plot(line[0], line[1], color = color, linestyle = '--')
         if mechanisms['max(a1, a2-gap)'] and self.p1 == self.mechanism.p1star:
             color = 'green'
             allocations = pa1_allocations
             a1 = [allocations[0].l(), allocations[0].h()]
+            draw_area(a1[0], a1[1], color)
             plt.plot(a1[0], a1[1], marker='o', color=color)
-            
-        #Limit the plot
-        plt.xlim(L0 - self.big_gap - self.mixing['transfer'] * Delta, LMax + self.big_gap)  # Limit x-axis
-        plt.ylim(H0 - self.big_gap - self.mixing['transfer'] * Delta, HMax + self.big_gap)  # Limit y-axis
+        
 
     def draw(self, plots):
 
